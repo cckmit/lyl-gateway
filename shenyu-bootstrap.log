@@ -1,0 +1,24 @@
+2021-05-30 22:29:07 [main] INFO  com.lyl.gateway.bootstrap.LylBootstrapApplication - Starting LylBootstrapApplication on DESKTOP-5P7KSJM with PID 284 (D:\lyl-gateway\lyl-bootstrap\target\classes started by Administrator in D:\lyl-gateway)
+2021-05-30 22:29:07 [main] INFO  com.lyl.gateway.bootstrap.LylBootstrapApplication - The following profiles are active: local
+2021-05-30 22:29:08 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 9195 (http)
+2021-05-30 22:29:08 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-9195"]
+2021-05-30 22:29:08 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2021-05-30 22:29:08 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.29]
+2021-05-30 22:29:08 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2021-05-30 22:29:08 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 747 ms
+2021-05-30 22:29:08 [main] INFO  org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+2021-05-30 22:29:08 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-9195"]
+2021-05-30 22:29:08 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 9195 (http) with context path ''
+2021-05-30 22:29:08 [main] INFO  com.lyl.gateway.bootstrap.LylBootstrapApplication - Started LylBootstrapApplication in 1.378 seconds (JVM running for 2.264)
+2021-05-30 22:30:17 [main] INFO  com.lyl.gateway.bootstrap.LylBootstrapApplication - Starting LylBootstrapApplication on DESKTOP-5P7KSJM with PID 3568 (D:\lyl-gateway\lyl-bootstrap\target\classes started by Administrator in D:\lyl-gateway)
+2021-05-30 22:30:17 [main] INFO  com.lyl.gateway.bootstrap.LylBootstrapApplication - The following profiles are active: local
+2021-05-30 22:30:17 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 9195 (http)
+2021-05-30 22:30:17 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-9195"]
+2021-05-30 22:30:17 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2021-05-30 22:30:17 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.29]
+2021-05-30 22:30:17 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2021-05-30 22:30:17 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 703 ms
+2021-05-30 22:30:18 [main] INFO  org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+2021-05-30 22:30:18 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-9195"]
+2021-05-30 22:30:18 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 9195 (http) with context path ''
+2021-05-30 22:30:18 [main] INFO  com.lyl.gateway.bootstrap.LylBootstrapApplication - Started LylBootstrapApplication in 1.363 seconds (JVM running for 2.319)
