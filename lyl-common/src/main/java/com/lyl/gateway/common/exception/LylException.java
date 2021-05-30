@@ -18,14 +18,14 @@
 package com.lyl.gateway.common.exception;
 
 /**
- * Shenyu Exception.
+ * lyl Exception.
  */
 public class LylException extends RuntimeException {
 
     private static final long serialVersionUID = 8068509879445395353L;
 
     /**
-     * Instantiates a new Shenyu exception.
+     * Instantiates a new lyl exception.
      *
      * @param e the e
      */
@@ -34,7 +34,7 @@ public class LylException extends RuntimeException {
     }
 
     /**
-     * Instantiates a new Shenyu exception.
+     * Instantiates a new lyl exception.
      *
      * @param message the message
      */
@@ -43,7 +43,7 @@ public class LylException extends RuntimeException {
     }
 
     /**
-     * Instantiates a new Shenyu exception.
+     * Instantiates a new lyl exception.
      *
      * @param message   the message
      * @param throwable the throwable

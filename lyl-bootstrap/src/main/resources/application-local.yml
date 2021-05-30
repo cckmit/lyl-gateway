@@ -21,7 +21,7 @@ spring:
    main:
      allow-bean-definition-overriding: true
    application:
-    name: shenyu-bootstrap
+    name: lyl-bootstrap
 #   cloud:
 #    nacos:
 #       discovery:
@@ -73,7 +73,7 @@ logging:
         root: info
         org.springframework.boot: info
         org.apache.ibatis: info
-        org.apache.shenyu.bonuspoint: info
-        org.apache.shenyu.lottery: info
-        org.apache.shenyu: info
+        org.apache.lyl.bonuspoint: info
+        org.apache.lyl.lottery: info
+        org.apache.lyl: info
 
