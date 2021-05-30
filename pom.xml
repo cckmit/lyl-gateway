@@ -22,6 +22,7 @@
         <module>lyl-disruptor</module>
         <module>lyl-spi</module>
         <module>lyl-common</module>
+        <module>lyl-sync-data-center</module>
     </modules>
 
     <properties>
