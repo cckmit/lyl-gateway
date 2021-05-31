@@ -23,6 +23,7 @@
         <module>lyl-spi</module>
         <module>lyl-common</module>
         <module>lyl-sync-data-center</module>
+        <module>lyl-spring-boot-starter</module>
     </modules>
 
     <properties>

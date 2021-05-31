@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.lyl.gateway.springboot.starter.sync.data.websocket.WebsocketSyncDataConfiguration
