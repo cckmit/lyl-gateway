@@ -23,5 +23,13 @@
     <modules>
         <module>lyl-spring-boot-starter-sync-data-websocket</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
     
 </project>
