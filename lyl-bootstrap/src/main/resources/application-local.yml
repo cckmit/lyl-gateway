@@ -20,6 +20,10 @@ management:
 lyl:
     file:
       enabled: true
+    corss:
+      enabled: true
+    dubbo:
+        parameter: multi
     sync:
         websocket :
              urls: ws://localhost:9095/websocket

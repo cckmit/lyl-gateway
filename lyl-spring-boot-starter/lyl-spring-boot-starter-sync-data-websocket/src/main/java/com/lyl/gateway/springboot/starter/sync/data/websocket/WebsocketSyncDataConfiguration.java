@@ -1,5 +1,7 @@
 package com.lyl.gateway.springboot.starter.sync.data.websocket;
 
+import com.lyl.gateway.plugin.base.cache.CommonPluginDataSubscriber;
+import com.lyl.gateway.plugin.base.handler.PluginDataHandler;
 import com.lyl.gateway.sync.data.api.AuthDataSubscriber;
 import com.lyl.gateway.sync.data.api.MetaDataSubscriber;
 import com.lyl.gateway.sync.data.api.PluginDataSubscriber;
@@ -44,5 +46,10 @@ public class WebsocketSyncDataConfiguration {
     public WebsocketConfig websocketConfig(){
         return new WebsocketConfig();
     }
+    @Bean
+    public PluginDataSubscriber pluginDataSubscriber(final ObjectProvider<List<PluginDataHandler>> pluginDataHandlerList) {
+        return new CommonPluginDataSubscriber(pluginDataHandlerList.getIfAvailable(Collections::emptyList));
+    }
+
 
 }

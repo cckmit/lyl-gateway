@@ -1,18 +1,15 @@
 package com.lyl.gateway.client.http.springmvc.init;
 
-import com.lyl.gateway.client.core.disruptor.LylClientRegisterEventPunlisher;
-import com.lyl.gateway.common.enums.RpcTypeEnum;
+import com.lyl.gateway.client.http.springmvc.config.LylSpringMvcConfig;
+import com.lyl.gateway.client.http.springmvc.dto.SpringMvcRegisterDTO;
 import com.lyl.gateway.common.utils.IpUtils;
-import com.lyl.gateway.register.client.spi.LylClientRegisterRepository;
-import com.lyl.gateway.register.common.config.LylRegisterCenterConfig;
-import com.lyl.gateway.register.common.dto.MetaDataRegisterDTO;
+import com.lyl.gateway.common.utils.OkHttpUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import java.util.Properties;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -24,52 +21,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class ContextRegisterListener implements ApplicationListener<ContextRefreshedEvent> {
 
-    private LylClientRegisterEventPunlisher punlisher = LylClientRegisterEventPunlisher.getInstance();
-    private final AtomicBoolean registered = new AtomicBoolean(false);
-    private String contextPath;
-    private String appName;
-    private String host;
-    private Integer port;
-    private final Boolean isFull;
+    private volatile AtomicBoolean registered = new AtomicBoolean(false);
+    private final String url;
+    private final LylSpringMvcConfig lylSpringmvcConfig;
 
-    public ContextRegisterListener(final LylRegisterCenterConfig config, final LylClientRegisterRepository registerRepository){
-        Properties props = config.getProps();
-        this.isFull = Boolean.parseBoolean(props.getProperty("isFull", "false"));
-        if (isFull){
-            String registerType = config.getRegisterType();
-            String serverLists = config.getServerLists();
-            String contextPath = props.getProperty("contextPath");
-            int port = Integer.parseInt(props.getProperty("port"));
-            if (StringUtils.isBlank(contextPath) || StringUtils.isBlank(registerType) || StringUtils.isBlank(serverLists) || port <= 0){
-                String errorMsg = "http register param must config the contextPath, registerType , serverLists and port must > 0";
-                log.error(errorMsg);
-                throw new RuntimeException(errorMsg);
-            }
-            this.appName = props.getProperty("appName");
-            this.host = props.getProperty("host");
-            this.port = port;
-            this.contextPath = contextPath;
-            punlisher.start(registerRepository);
+
+    public ContextRegisterListener(final LylSpringMvcConfig lylSpringmvcConfig){
+        String contextPath = lylSpringmvcConfig.getContextPath();
+        String adminUrl = lylSpringmvcConfig.getAdminUrl();
+        Integer port = lylSpringmvcConfig.getPort();
+        if (contextPath == null || "".equals(contextPath)
+                || adminUrl == null || "".equals(adminUrl)
+                || port == null) {
+            log.error("spring mvc param must config  contextPath ,adminUrl and port ");
+            throw new RuntimeException("spring mvc param must config  contextPath ,adminUrl and port");
         }
-    }
-
-    private MetaDataRegisterDTO buildMetaDataDTO(){
-        String contextPath = this.contextPath;
-        String appName = this.appName;
-        Integer port = this.port;
-        String path = contextPath + "/**";
-        String configHost = this.host;
-        String host = StringUtils.isBlank(configHost) ? IpUtils.getHost() : configHost;
-        return MetaDataRegisterDTO.builder()
-                .contextPath(contextPath)
-                .host(host)
-                .port(port)
-                .appName(appName)
-                .path(path)
-                .rpcType(RpcTypeEnum.HTTP.getName())
-                .enabled(true)
-                .ruleName(path)
-                .build();
+        this.lylSpringmvcConfig = lylSpringmvcConfig;
+        url = adminUrl + "/soul-client/springmvc-register";
     }
 
     @Override
@@ -77,11 +45,42 @@ public class ContextRegisterListener implements ApplicationListener<ContextRefre
         if (!registered.compareAndSet(false, true)){
             return;
         }
-        if (isFull){
-            punlisher.publishEvent(buildMetaDataDTO());
+        if (lylSpringmvcConfig.isFull()){
+            post(buildJsonParams(lylSpringmvcConfig.getContextPath()));
         }
     }
 
+    private void post(final String json) {
+        try {
+            String result = OkHttpUtils.getInstance().post(url, json);
+            if (Objects.equals(result, "success")) {
+                log.info("http context register success :{} " + json);
+            } else {
+                log.error("http context register error :{} " + json);
+            }
+        } catch (IOException e) {
+            log.error("cannot register soul admin param :{}", url + ":" + json);
+        }
+    }
+
+    private String buildJsonParams(final String contextPath) {
+        String appName = lylSpringmvcConfig.getAppName();
+        Integer port = lylSpringmvcConfig.getPort();
+        String path = contextPath + "/**";
+        String configHost = lylSpringmvcConfig.getHost();
+        String host = ("".equals(configHost) || null == configHost) ? IpUtils.getHost() : configHost;
+        SpringMvcRegisterDTO registerDTO = SpringMvcRegisterDTO.builder()
+                .context(contextPath)
+                .host(host)
+                .port(port)
+                .appName(appName)
+                .path(path)
+                .rpcType("http")
+                .enabled(true)
+                .ruleName(path)
+                .build();
+        return OkHttpUtils.getInstance().getGosn().toJson(registerDTO);
+    }
 
 }
 

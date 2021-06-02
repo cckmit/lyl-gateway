@@ -5,7 +5,6 @@ import com.lyl.gateway.sync.data.websocket.WebsocketSyncDataService;
 import com.lyl.gateway.sync.data.websocket.config.WebsocketConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;

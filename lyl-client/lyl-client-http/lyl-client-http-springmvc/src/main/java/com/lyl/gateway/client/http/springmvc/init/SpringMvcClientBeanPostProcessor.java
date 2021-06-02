@@ -1,24 +1,23 @@
 package com.lyl.gateway.client.http.springmvc.init;
 
-import com.lyl.gateway.client.core.disruptor.LylClientRegisterEventPunlisher;
 import com.lyl.gateway.client.http.springmvc.annotation.LylSpringMvcClient;
+import com.lyl.gateway.client.http.springmvc.config.LylSpringMvcConfig;
+import com.lyl.gateway.client.http.springmvc.dto.SpringMvcRegisterDTO;
 import com.lyl.gateway.common.utils.IpUtils;
-import com.lyl.gateway.register.client.spi.LylClientRegisterRepository;
-import com.lyl.gateway.register.common.config.LylRegisterCenterConfig;
-import com.lyl.gateway.register.common.dto.MetaDataRegisterDTO;
+import com.lyl.gateway.common.utils.OkHttpUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,83 +31,83 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SpringMvcClientBeanPostProcessor implements BeanPostProcessor {
 
-    private LylClientRegisterEventPunlisher punlisher = LylClientRegisterEventPunlisher.getInstance();
     private final ThreadPoolExecutor executorService;
-    private final String contextPath;
-    private final String appName;
-    private final String host;
-    private final Integer port;
-    private final Boolean isFull;
+    private final String url;
+    private final LylSpringMvcConfig lylSpringMvcConfig;
 
-    public SpringMvcClientBeanPostProcessor(final LylRegisterCenterConfig config, final LylClientRegisterRepository lylClientRegisterRepository) {
+    public SpringMvcClientBeanPostProcessor(final LylSpringMvcConfig lylSpringMvcConfig) {
 
-        String registerType = config.getRegisterType();
-        String serverLists = config.getServerLists();
-        Properties props = config.getProps();
-        int port = Integer.parseInt(props.getProperty("port"));
-        if (StringUtils.isBlank(registerType) || StringUtils.isBlank(serverLists) || port <= 0) {
-            String errorMsg = "http register param must config the registerType , serverLists and port must > 0";
-            log.error(errorMsg);
-            throw new RuntimeException(errorMsg);
+        String contextPath = lylSpringMvcConfig.getContextPath();
+        String adminUrl = lylSpringMvcConfig.getAdminUrl();
+        Integer port = lylSpringMvcConfig.getPort();
+        if (contextPath == null || "".equals(contextPath)
+                || adminUrl == null || "".equals(adminUrl)
+                || port == null) {
+            log.error("spring mvc param must config  contextPath ,adminUrl and port ");
+            throw new RuntimeException("spring mvc param must config  contextPath ,adminUrl and port");
         }
-        this.appName = props.getProperty("appName");
-        this.host = props.getProperty("host");
-        this.port = port;
-        this.contextPath = props.getProperty("contextPath");
-        this.isFull = Boolean.parseBoolean(props.getProperty("isFull", "false"));
+        this.lylSpringMvcConfig = lylSpringMvcConfig;
+        url = adminUrl + "/soul-client/springmvc-register";
         executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        punlisher.start(lylClientRegisterRepository);
 
     }
 
     @Override
     public Object postProcessAfterInitialization(@NonNull final Object bean, @NonNull final String beanName) throws BeansException {
-        if (isFull){
+        if (lylSpringMvcConfig.isFull()) {
             return bean;
         }
         Controller controller = AnnotationUtils.findAnnotation(bean.getClass(), Controller.class);
+        RestController restController = AnnotationUtils.findAnnotation(bean.getClass(), RestController.class);
         RequestMapping requestMapping = AnnotationUtils.findAnnotation(bean.getClass(), RequestMapping.class);
-        if (controller != null || requestMapping != null){
-            LylSpringMvcClient classAnnotation = AnnotationUtils.findAnnotation(bean.getClass(), LylSpringMvcClient.class);
+        if (controller != null || restController != null || requestMapping != null) {
+            String contextPath = lylSpringMvcConfig.getContextPath();
+            LylSpringMvcClient clazzAnnotation = AnnotationUtils.findAnnotation(bean.getClass(), LylSpringMvcClient.class);
             String prePath = "";
-            if (Objects.isNull(classAnnotation)){
-                return bean;
-            }
-            if (classAnnotation.path().indexOf("*") > 1){
-                String finalPrePath = prePath;
-                executorService.execute(() -> punlisher.publishEvent(buildMetaDataDTO(classAnnotation, finalPrePath)));
-                return bean;
-            }
-            prePath = classAnnotation.path();
-            final Method[] methods = ReflectionUtils.getUniqueDeclaredMethods(bean.getClass());
-            for (Method method : methods){
-                LylSpringMvcClient lylSpringMvcClient = AnnotationUtils.findAnnotation(method, LylSpringMvcClient.class);
-                if (Objects.nonNull(lylSpringMvcClient)){
+            if (Objects.nonNull(clazzAnnotation)) {
+                if (clazzAnnotation.path().indexOf("*") > 1) {
                     String finalPrePath = prePath;
-                    executorService.execute(() -> punlisher.publishEvent(buildMetaDataDTO(lylSpringMvcClient, finalPrePath)));
+                    executorService.execute(() -> post(buildJsonParams(clazzAnnotation, contextPath, finalPrePath)));
+                    return bean;
+                }
+                prePath = clazzAnnotation.path();
+            }
+            final Method[] methods = ReflectionUtils.getUniqueDeclaredMethods(bean.getClass());
+            for (Method method : methods) {
+                LylSpringMvcClient lylSpringMvcClient = AnnotationUtils.findAnnotation(method, LylSpringMvcClient.class);
+                if (Objects.nonNull(lylSpringMvcClient)) {
+                    String finalPrePath = prePath;
+                    executorService.execute(() -> post(buildJsonParams(lylSpringMvcClient, contextPath, finalPrePath)));
                 }
             }
         }
         return bean;
     }
 
-    private MetaDataRegisterDTO buildMetaDataDTO(final LylSpringMvcClient lylSpringMvcClient, final String prePath) {
-        String contextPath = this.contextPath;
-        String appName = this.appName;
-        Integer port = this.port;
-        String path;
-        if (StringUtils.isEmpty(contextPath)) {
-            path = prePath + lylSpringMvcClient.path();
-        } else {
-            path = contextPath + prePath + lylSpringMvcClient.path();
+    private void post(final String json) {
+        try {
+            String result = OkHttpUtils.getInstance().post(url, json);
+            if (Objects.equals(result, "success")) {
+                log.info("http client register success :{} " + json);
+            } else {
+                log.error("http client register error :{} " + json);
+            }
+        } catch (IOException e) {
+            log.error("cannot register soul admin param :{}", url + ":" + json);
         }
+    }
+
+    private String buildJsonParams(final LylSpringMvcClient lylSpringMvcClient, final String contextPath, final String prePath) {
+        String appName = lylSpringMvcConfig.getAppName();
+        Integer port = lylSpringMvcConfig.getPort();
+        String path = contextPath + prePath + lylSpringMvcClient.path();
         String desc = lylSpringMvcClient.desc();
-        String configHost = this.host;
-        String host = StringUtils.isBlank(configHost) ? IpUtils.getHost() : configHost;
+        String configHost = lylSpringMvcConfig.getHost();
+        String host = ("".equals(configHost) || null == configHost) ? IpUtils.getHost() : configHost;
         String configRuleName = lylSpringMvcClient.ruleName();
-        String ruleName = StringUtils.isBlank(configRuleName) ? path : configRuleName;
-        return MetaDataRegisterDTO.builder()
-                .contextPath(contextPath)
+        String ruleName = ("".equals(configRuleName)) ? path : configRuleName;
+        SpringMvcRegisterDTO registerDTO = SpringMvcRegisterDTO.builder()
+                .context(contextPath)
                 .host(host)
                 .port(port)
                 .appName(appName)
@@ -119,27 +118,6 @@ public class SpringMvcClientBeanPostProcessor implements BeanPostProcessor {
                 .ruleName(ruleName)
                 .registerMetaData(lylSpringMvcClient.registerMetaData())
                 .build();
+        return OkHttpUtils.getInstance().getGosn().toJson(registerDTO);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

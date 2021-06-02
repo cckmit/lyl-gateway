@@ -6,25 +6,19 @@
 
     <parent>
         <groupId>com.lyl.gateway</groupId>
-        <artifactId>lyl-gateway</artifactId>
+        <artifactId>lyl-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.lyl.gateway</groupId>
-    <artifactId>lyl-spring-boot-starter</artifactId>
+    <artifactId>lyl-plugin-base</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>lyl-spring-boot-starter-sync-data-websocket</module>
-        <module>lyl-spring-boot-starter-client-springmvc</module>
-    </modules>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <groupId>com.lyl.gateway</groupId>
+            <artifactId>lyl-plugin-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     

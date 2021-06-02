@@ -1,7 +1,6 @@
 package com.lyl.gateway.sync.data.websocket;
 
 import com.lyl.gateway.common.LylThreadFactory;
-import com.lyl.gateway.common.dto.PluginData;
 import com.lyl.gateway.sync.data.api.AuthDataSubscriber;
 import com.lyl.gateway.sync.data.api.MetaDataSubscriber;
 import com.lyl.gateway.sync.data.api.PluginDataSubscriber;

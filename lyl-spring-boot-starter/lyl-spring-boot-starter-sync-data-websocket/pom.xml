@@ -15,11 +15,6 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
-
 
     <dependencies>
         <dependency>
@@ -46,6 +41,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lyl.gateway</groupId>
+            <artifactId>lyl-plugin-base</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     

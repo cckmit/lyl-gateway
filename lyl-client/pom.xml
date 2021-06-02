@@ -22,7 +22,7 @@
 
     <modules>
         <module>lyl-client-http</module>
-        <module>lyl-client-core</module>
+        <module>lyl-client-common</module>
     </modules>
 
 

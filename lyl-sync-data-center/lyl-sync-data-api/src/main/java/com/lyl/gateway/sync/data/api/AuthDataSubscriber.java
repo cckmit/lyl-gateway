@@ -1,8 +1,6 @@
 package com.lyl.gateway.sync.data.api;
 
 import com.lyl.gateway.common.dto.AppAuthData;
-import com.lyl.gateway.common.dto.AuthPathData;
-import com.lyl.gateway.common.dto.MetaData;
 
 /**
  * @ClassName AuthDataSubscriber
